@@ -1,58 +1,6 @@
 name: Sync Kindle Highlights
 
+# DISABLED - will be rebuilt to use My Clippings.txt instead of web scraper
 on:
-  schedule:
-    - cron: '*/13 * * * *'  # Every 13 minutes
-  
   workflow_dispatch:
-    # Allow manual trigger from GitHub Actions UI
-
-env:
-  AMAZON_REGION: ${{ vars.AMAZON_REGION || 'com' }}
-
-jobs:
-  scrape-and-sync:
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-          cache: 'pip'
-          cache-dependency-path: 'scraper/requirements.txt'
-      
-      - name: Install Python dependencies
-        working-directory: scraper
-        run: pip install -r requirements.txt
-      
-      - name: Cache Playwright browsers
-        uses: actions/cache@v4
-        id: playwright-cache
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-chromium-${{ runner.os }}
-      
-      - name: Install Playwright browsers
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: playwright install chromium
-      
-      - name: Install Playwright system deps
-        run: playwright install-deps chromium
-      
-      - name: Decode and write auth.json
-        working-directory: scraper
-        run: |
-          mkdir -p data
-          echo "${{ secrets.AMAZON_AUTH_JSON_B64 }}" | base64 --decode > data/auth.json
-      
-      - name: Run scraper
-        working-directory: scraper
-        env:
-          GITHUB_TOKEN: ${{ secrets.GIST_PAT }}
-          GIST_ID: ${{ secrets.GIST_ID }}
-          AMAZON_REGION: ${{ env.AMAZON_REGION }}
-        run: python -m app.main
+    # Manual trigger only -- all scheduled runs are disabled
