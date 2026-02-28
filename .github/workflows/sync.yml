@@ -2,8 +2,7 @@ name: Sync Kindle Highlights
 
 on:
   schedule:
-    # Run every 15 minutes
-    - cron: '*/15 * * * *'
+    - cron: '*/13 * * * *'  # Every 13 minutes
   
   workflow_dispatch:
     # Allow manual trigger from GitHub Actions UI
@@ -28,21 +27,27 @@ jobs:
       
       - name: Install Python dependencies
         working-directory: scraper
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+        run: pip install -r requirements.txt
+      
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}
       
       - name: Install Playwright browsers
-        run: |
-          playwright install chromium
-          playwright install-deps chromium
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: playwright install chromium
+      
+      - name: Install Playwright system deps
+        run: playwright install-deps chromium
       
       - name: Decode and write auth.json
         working-directory: scraper
         run: |
           mkdir -p data
           echo "${{ secrets.AMAZON_AUTH_JSON_B64 }}" | base64 --decode > data/auth.json
-          echo "Auth file created at data/auth.json"
       
       - name: Run scraper
         working-directory: scraper
@@ -50,13 +55,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GIST_PAT }}
           GIST_ID: ${{ secrets.GIST_ID }}
           AMAZON_REGION: ${{ env.AMAZON_REGION }}
-        run: |
-          python -m app.main
-      
-      - name: Upload latest.json artifact (for debugging)
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: latest-highlights
-          path: scraper/data/latest.json
-          retention-days: 7
+        run: python -m app.main
