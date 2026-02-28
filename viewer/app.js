@@ -4,7 +4,7 @@
  */
 
 // CONFIGURATION - Update this with your Gist raw URL
-const GIST_RAW_URL = 'YOUR_GIST_RAW_URL_HERE';
+const GIST_RAW_URL = 'https://gist.githubusercontent.com/langlois33682/aeb0a9e901f55d999c46397e2213ef58/raw/latest.json';
 // Example: 'https://gist.githubusercontent.com/USERNAME/GIST_ID/raw/latest.json'
 
 const container = document.getElementById('highlights-container');
