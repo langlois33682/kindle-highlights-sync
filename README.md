@@ -1,4 +1,4 @@
-# Kindle Highlights Sync
+# Kindle Highlights Sync!
 
 Automatically sync your latest Kindle highlights to your phone using GitHub Actions, GitHub Gist, and GitHub Pages — completely free!
 
